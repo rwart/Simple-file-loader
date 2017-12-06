@@ -1,0 +1,34 @@
+{
+  "name": "Simple-file-loader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "grunt test",
+    "wait": "grunt wait",
+    "doc": "grunt doc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rwart/Simple-file-loader.git"
+  },
+  "author": "rwart",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/rwart/Simple-file-loader/issues"
+  },
+  "homepage": "https://github.com/rwart/Simple-file-loader#readme",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-browser-sync": "^2.2.0",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-jsdoc": "^2.2.0"
+  },
+  "dependencies": {
+    "colors": "^1.1.2",
+    "formidable": "^1.1.1"
+  }
+}

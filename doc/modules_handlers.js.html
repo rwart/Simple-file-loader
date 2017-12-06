@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: modules/handlers.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: modules/handlers.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+/**
+ * @Module handlers
+ */
+var fs = require('fs');
+
+/**
+ * start - returns welcome (start) page
+ *
+ * @param  {object} request - object defined in http module
+ * @param  {object} response - object defined in http module
+ */
+exports.start = function (request, response) {
+  'use strict';
+  console.log('Rozpoczynam obsługę żądania start');
+  fs.readFile('./templates/start.html', function (err, html) {
+    console.assert(!err, err);
+    response.writeHead(200, { 'Content-Type': 'text/html; charset=uft-8' });
+    response.write(html);
+    response.end();
+  });
+};
+
+/**
+ * style - retsurns css style sheets
+ *
+ * @param  {object} request - object defined in http module
+ * @param  {object} response - object defined in http module
+ */
+exports.style = function (request, response) {
+  'use strict';
+  console.log('Rozpoczynam obsługę żądania css');
+  fs.readFile('./templates' + request.url, function (err, cssFile) {
+    console.assert(!err, err);
+    response.writeHead(200, { 'Content-Type': 'text/css' });
+    response.write(cssFile);
+    response.end();
+  });
+};
+
+var formidable = require('formidable');
+var util = require('util');
+
+/**
+ * upload - uploads files on server
+ *
+ * @param  {object} request - object defined in http module
+ * @param  {object} response - object defined in http module
+ */
+
+exports.upload = function (request, response) {
+  'use strict';
+  console.log('Rozpoczynam obsługę żądania upload.');
+  var form = new formidable.IncomingForm();
+  form.multiples = true;
+  form.parse(request, function (error, fields, files) {
+    console.assert(!error, error);
+    /* console.log(util.inspect({ fields: fields, files: files },
+      { showHidden: false, depth: null }));*/
+    fs.readFile('./templates/upload.html', function (err, html) {
+      console.assert(!err, err);
+      response.writeHead(200, { 'Content-Type': 'text/html; charset=uft-8' });
+      response.write(html);
+      if (Array.isArray(files.upload)) {
+        files.upload.forEach(function (file) {
+          uploadSend(file);
+        });
+      } else {
+        uploadSend(files.upload);
+      }
+
+      response.end('&lt;/div>&lt;/body>&lt;/html>');
+    });
+
+  });
+
+  function uploadSend(file) {
+    if (file.type === 'image/png'  ||
+        file.type === 'image/jpeg' ||
+        file.type === 'image/gif') {
+      fs.renameSync(file.path, './show/' + file.type + '/' + file.name);
+      var url = '/'  + file.type + '/' + file.name;
+      var html = '&lt;a href="' + url + '">' + '&lt;img src="' + url + '">' + '&lt;/a>';
+      response.write(html);
+    }
+  }
+};
+
+png = new RegExp('^/image/png.*');
+jpeg = new RegExp('^/image/jpeg.*');
+gif = new RegExp('^/image/gif.*');
+
+/**
+ * show - returns uploaded image file
+ *
+ * @param  {object} request - object defined in http module
+ * @param  {object} response - object defined in http module
+ */
+exports.show = function (request, response) {
+  'use strict';
+  if (request.url !== '/image/' &amp;&amp; fs.existsSync('./show' + request.url)) {
+    fs.readFile('./show' + request.url, 'binary', function (err, file) {
+          var contentType = {};
+          if (png.test(request.url)) {
+            contentType = { 'Content-Type': 'image/png' };
+          } else if (jpeg.test(request.url)) {
+            contentType = { 'Content-Type': 'image/jpeg' };
+          } else if (gif.test(request.url)) {
+            contentType = { 'Content-Type': 'image/gif' };
+          }
+
+          if (contentType !== {}) {
+            response.writeHead(200, contentType);
+            response.write(file, 'binary');
+          } else {
+            response.writeHead(500, { 'Content-Type': 'text/html; charset=uft-8' });
+            response.write(':(');
+          }
+
+          response.end();
+        });
+  } else {
+    response.writeHead(404, { 'Content-Type': 'text/html; charset=uft-8' });
+    response.write('file: ' + request.url + ' not found');
+    response.end();
+  }
+};
+
+/**
+ * error - used for 404 error
+ *
+ * @param  {object} request - object defined in http module
+ * @param  {object} response - object defined in http module
+ */
+exports.error = function (request, response) {
+  console.log('Nie wiem co robić.');
+  response.writeHead(404, { 'Content-Type': 'text/html; charset=uft-8' });
+  response.write('404 :(');
+  response.end();
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-handlers.html">handlers</a></li><li><a href="module-index.html">index</a></li><li><a href="module-server.html">server</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Dec 06 2017 21:26:56 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
